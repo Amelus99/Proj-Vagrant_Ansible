@@ -1,0 +1,172 @@
+---
+# Playbook para configurar a VM provisionada pelo Vagrant
+- name: Configuração inicial da VM
+  hosts: all
+  become: true # Permite executar tarefas como root
+  collections:
+    - community.general
+
+  tasks:
+    # 2.2.1 Atualização do sistema operacional 5p
+    - name: Atualizar todos os pacotes do sistema
+      apt:
+        update_cache: yes
+        upgrade: dist
+
+    # 2.2.2 Configura do hostname 5p
+    - name: Configurar o hostname
+      hostname:
+        name: "p01-samuel"
+
+    # 2.2.3 Criando grupos necessários
+    - name: Criar grupo "acesso_ssh"
+      group:
+        name: acesso_ssh
+
+    - name: Criar grupo "ifpb"
+      group:
+        name: ifpb
+
+    # 2.2.3 Criando usuários 5p
+    - name: Criar usuário "samuel"
+      user:
+        name: samuel
+        comment: "Usuário do projeto"
+        groups: "ifpb,acesso_ssh"
+        create_home: yes
+
+    # 2.2.4 Mensagem de saudação 5p
+    - name: Configurar mensagem de saudação (MOTD)
+      copy:
+        dest: /etc/motd
+        content: |
+          Acesso restrito apenas à pessoas com autorização expressa
+          Seu acesso está sendo monitorado !!!
+
+    # 2.5.5 Configuração de SUDO 5p
+    - name: Permitir que o grupo "ifpb" tenha acesso SUDO
+      copy:
+        dest: /etc/sudoers.d/ifpb
+        content: "%ifpb ALL=(ALL) NOPASSWD:ALL"
+        mode: "0440"
+
+    # Copiar chave pública da VM para o host
+    - name: Gerar chaves SSH para o usuário "samuel" (se ainda não existir)
+      user:
+        name: samuel
+        generate_ssh_key: yes
+
+    - name: Obter a chave pública da máquina virtual
+      command: cat /home/samuel/.ssh/id_rsa.pub
+      register: ssh_pub_key
+
+    - name: Adicionar a chave pública da VM no host
+      local_action:
+        module: copy
+        content: "{{ ssh_pub_key.stdout }}"
+        dest: "/home/{{ ansible_user }}/.ssh/authorized_keys"
+      delegate_to: localhost
+      become: false
+
+    # 2.2.6 Configuração de SSH 15p
+    - name: Configurar autenticação SSH
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: "^#?PermitRootLogin"
+        line: "PermitRootLogin no"
+
+    - name: Permitir apenas autenticação por chave pública
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: "^#?PasswordAuthentication"
+        line: "PasswordAuthentication no"
+
+    - name: Permitir acesso apenas ao grupo "acesso_ssh"
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: "^#?AllowGroups"
+        line: "AllowGroups acesso_ssh"
+
+    - name: Reiniciar o serviço SSH
+      service:
+        name: ssh
+        state: restarted
+
+    # 2.2.7 Configuração de LVM 15p
+    - name: Instalar pacotes necessários para LVM
+      apt:
+        name: lvm2
+        state: present
+
+    - name: Criar Volume Group chamado "dados"
+      lvg:
+        vg: dados
+        pvs:
+          - /dev/sdb
+          - /dev/sdc
+          - /dev/sdd
+
+    - name: Criar Logical Volume "sistema"
+      community.general.lvol:
+        vg: dados
+        lv: sistema
+        size: 15g
+
+    - name: Formatar o LV "sistema" como ext4
+      filesystem:
+        fstype: ext4
+        dev: "/dev/dados/sistema"
+
+    - name: Configurar montagem automática no /etc/fstab
+      lineinfile:
+        path: /etc/fstab
+        line: "/dev/dados/sistema /dados ext4 defaults 0 0"
+
+    - name: Criar diretório /dados e montar a partição
+      file:
+        path: /dados
+        state: directory
+      notify: Montar partição
+
+    # 2.2.8 Configuração de NFS 15p
+    - name: Instalar o servidor NFS
+      apt:
+        name: nfs-kernel-server
+        state: present
+
+    - name: Criar usuário "nfs-ifpb" para NFS
+      user:
+        name: nfs-ifpb
+        shell: /usr/sbin/nologin
+
+    - name: Criar diretório NFS
+      file:
+        path: /dados/nfs
+        state: directory
+        owner: nfs-ifpb
+        group: nfs-ifpb
+
+    - name: Configurar diretório compartilhado NFS
+      blockinfile:
+        path: /etc/exports
+        block: |
+          /dados/nfs 192.168.57.0/24(rw,sync,no_root_squash,no_subtree_check,anonuid=1001,anongid=1001)
+
+    - name: Reiniciar o servidor NFS
+      service:
+        name: nfs-kernel-server
+        state: restarted
+
+    # 2.2.9 Monitoramento de acesso 15p
+    - name: Configurar script de monitoramento de acessos
+      copy:
+        dest: /etc/profile.d/monitor_acesso.sh
+        content: |
+          #!/bin/bash
+          echo "$(date '+%Y-%m-%d %H:%M'); $USER; $SSH_TTY; $SSH_CLIENT" >> /dados/nfs/acessos
+        mode: "0755"
+
+  handlers:
+    - name: Montar partição
+      command: mount -a
+
