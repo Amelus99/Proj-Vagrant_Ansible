@@ -7,7 +7,7 @@
 Vagrant.configure("2") do |config|
 
   # Configuração da Box
-  config.vm.box = "debian/bullseye64"
+  config.vm.box = "debian/bookworm64"
 
   # Configuração da VM
   config.vm.provider "virtualbox" do |vb|
