@@ -50,47 +50,49 @@
         content: "%ifpb ALL=(ALL) NOPASSWD:ALL"
         mode: "0440"
 
-    # Copiar chave pública da VM para o host
-    - name: Gerar chaves SSH para o usuário "samuel" (se ainda não existir)
-      user:
-        name: samuel
-        generate_ssh_key: yes
-
-    - name: Obter a chave pública da máquina virtual
-      command: cat /home/samuel/.ssh/id_rsa.pub
-      register: ssh_pub_key
-
-    - name: Adicionar a chave pública da VM no host
-      local_action:
-        module: copy
-        content: "{{ ssh_pub_key.stdout }}"
-        dest: "/home/{{ ansible_user }}/.ssh/authorized_keys"
-      delegate_to: localhost
-      become: false
-
-    # 2.2.6 Configuração de SSH 15p
-    - name: Configurar autenticação SSH
+    # Configurar o serviço SSH
+    - name: Permitir apenas chaves públicas
       lineinfile:
         path: /etc/ssh/sshd_config
-        regexp: "^#?PermitRootLogin"
-        line: "PermitRootLogin no"
-
-    - name: Permitir apenas autenticação por chave pública
-      lineinfile:
-        path: /etc/ssh/sshd_config
-        regexp: "^#?PasswordAuthentication"
+        state: present
+        regexp: "^PasswordAuthentication"
         line: "PasswordAuthentication no"
-
+    
+    - name: Bloquear root via SSH
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        state: present
+        regexp: "^PermitRootLogin"
+        line: "PermitRootLogin no"
+    
+    - name: Reiniciar serviço SSH
+      service:
+        name: ssh
+        state: restarted
+    
+    # Configurar chaves públicas para os usuários
+    - name: Garantir que o diretório ~/.ssh existe para todos os usuários
+      file:
+        path: "/home/{{ item }}/.ssh"
+        state: directory
+        mode: '0700'
+        owner: "{{ item }}"
+        group: "{{ item }}"
+      with_items:
+        - samuel
+    - name: Copiar chave pública do host para os usuários remotos
+      authorized_key:
+        user: "{{ item }}"
+        state: present
+        key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+      with_items:
+        - samuel
+        
     - name: Permitir acesso apenas ao grupo "acesso_ssh"
       lineinfile:
         path: /etc/ssh/sshd_config
         regexp: "^#?AllowGroups"
         line: "AllowGroups acesso_ssh"
-
-    - name: Reiniciar o serviço SSH
-      service:
-        name: ssh
-        state: restarted
 
     # 2.2.7 Configuração de LVM 15p
     - name: Instalar pacotes necessários para LVM
