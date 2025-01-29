@@ -11,7 +11,7 @@ Vagrant.configure("2") do |config|
 
   # Configuração da VM
   config.vm.provider "virtualbox" do |vb|
-    vb.name = "p01_samuel" # Nome da VM
+    vb.name = "p01_samuel_isabel" # Nome da VM
     vb.memory = 1024       # Memória RAM
 
     # Adicionando discos adicionais
