@@ -239,7 +239,7 @@ Esta tarefa realiza a instalação dos pacotes necessários para o servidor NFS,
 
 O conteúdo descreve a tarefa, que consiste em configurar um script de monitoramento de acessos. O módulo copy é utilizado para criar ou modificar arquivos no destino especificado. A diretiva dest define o caminho onde o script será salvo, que é /etc/profile.d/monitor_acesso.sh. 
 #
-# Testes e funcionalidade
+# Testes e Funcionalidade
 ### Verificação da conectividade.
 
       samuel@samuel-Latitude-5430:~/Downloads/projetos$ ssh isabel@192.168.57.10  
