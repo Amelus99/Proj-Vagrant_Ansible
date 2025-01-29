@@ -1,0 +1,46 @@
+# Configurar o serviço SSH
+- name: Permitir apenas chaves públicas
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    state: present
+    regexp: "^PasswordAuthentication"
+    line: "PasswordAuthentication no"
+
+- name: Bloquear root via SSH
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    state: present
+    regexp: "^PermitRootLogin"
+    line: "PermitRootLogin no"
+
+- name: Reiniciar serviço SSH
+  service:
+    name: ssh
+    state: restarted
+
+# Configurar chaves públicas para os usuários
+- name: Garantir que o diretório ~/.ssh existe para todos os usuários
+  file:
+    path: "/home/{{ item }}/.ssh"
+    state: directory
+    mode: '0700'
+    owner: "{{ item }}"
+    group: "{{ item }}"
+  with_items:
+    - samuel
+    - isabel
+    
+- name: Copiar chave pública do host para os usuários remotos
+  authorized_key:
+    user: "{{ item }}"
+    state: present
+    key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+  with_items:
+    - samuel
+    - isabel
+    
+- name: Permitir acesso apenas ao grupo "acesso_ssh"
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?AllowGroups"
+    line: "AllowGroups acesso_ssh"

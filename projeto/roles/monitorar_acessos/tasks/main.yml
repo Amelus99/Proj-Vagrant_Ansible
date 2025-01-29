@@ -1,0 +1,7 @@
+    - name: Configurar script de monitoramento de acessos
+      copy:
+        dest: /etc/profile.d/monitor_acesso.sh
+        content: |
+          #!/bin/bash
+          echo "$(date '+%Y-%m-%d %H:%M'); $USER; $SSH_TTY; $SSH_CLIENT" >> /dados/nfs/acessos
+        mode: "0755"
