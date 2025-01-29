@@ -16,7 +16,7 @@
     # 2.2.2 Configura do hostname 5p
     - name: Configurar o hostname
       hostname:
-        name: "p01-samuel"
+        name: "p01-samuel-isabel"
 
     # 2.2.3 Criando grupos necessários
     - name: Criar grupo "acesso_ssh"
@@ -28,12 +28,14 @@
         name: ifpb
 
     # 2.2.3 Criando usuários 5p
-    - name: Criar usuário "samuel"
-      user:
-        name: samuel
-        comment: "Usuário do projeto"
+    - name: Criar Usuários
+      ansible.builtin.user:
+        name: "{{ item }}"
         groups: "ifpb,acesso_ssh"
-        create_home: yes
+        state: present
+      loop:
+       - samuel
+       - isabel
 
     # 2.2.4 Mensagem de saudação 5p
     - name: Configurar mensagem de saudação (MOTD)
@@ -80,6 +82,8 @@
         group: "{{ item }}"
       with_items:
         - samuel
+        - isabel
+        
     - name: Copiar chave pública do host para os usuários remotos
       authorized_key:
         user: "{{ item }}"
@@ -87,6 +91,7 @@
         key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
       with_items:
         - samuel
+        - isabel
         
     - name: Permitir acesso apenas ao grupo "acesso_ssh"
       lineinfile:
