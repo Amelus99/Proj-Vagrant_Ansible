@@ -92,31 +92,31 @@ As roles, são um agrupamento de tarefas que podem ser reutilizadas para a confi
 ### **Configurar Hostname** 
 Define o nome do host para o sistema.
 
-      - name: Configurar Hostname  
-        hostname:  
-          name: "p01-Isabel"
+      - name: Configurar Hostname
+         hostname:
+           name: "p01-samuel-isabel"
 
 ### **Criar Usuários** 
 O objetivo é configurar rapidamente um ambiente com grupos e usuários, facilitando o controle de acesso, especialmente para conexões via SSH.
 
-      - name: Criar grupo aceso_ssh  
-        ansible.builtin.group:  
-          name: acesso_ssh  
-          state: present  
+      - name: Criar grupo acesso_ssh
+        ansible.builtin.group:
+          name: acesso_ssh
+          state: present
       
-      - name: Criar grupo "ifpb"  
-        ansible.builtin.group:  
-          name: ifpb  
-          state: present  
-      
-      - name: Criar Usuários  
-        ansible.builtin.user:  
-          name: "{{ item }}"  
-          groups: "ifpb,acesso_ssh"  
-          state: present  
-        loop:  
-          - isabel  
-          - ifpb
+      - name: Criar grupo "ifpb"
+        ansible.builtin.group:
+          name: ifpb
+          state: present
+          
+      - name: Criar Usuários
+        ansible.builtin.user:
+          name: "{{ item }}"
+          groups: "ifpb,acesso_ssh"
+          state: present
+        loop:
+         - samuel
+         - isabel
 
 
 ### **Mensagem de Saudação:** 
@@ -142,100 +142,165 @@ O código permite que os membros do grupo ifpb tenham acesso sudo sem exigir sen
 
 A ação realiza a alteração da configuração do SSH para permitir apenas a autenticação por chaves públicas, desativando a autenticação por senha. Em seguida, modifica a configuração para bloquear o login do usuário root via SSH, garantindo maior segurança. Por fim, o serviço SSH é reiniciado para que as novas configurações entrem em vigor.
 
-      - name: Permitir apenas chaves públicas  
-        lineinfile:  
-          path: /etc/ssh/sshd_config  
-          state: present  
-          regexp: "^PasswordAuthentication"  
-          line: "PasswordAuthentication no"  
+      # Configurar o serviço SSH
+      - name: Permitir apenas chaves públicas
+        lineinfile:
+          path: /etc/ssh/sshd_config
+          state: present
+          regexp: "^PasswordAuthentication"
+          line: "PasswordAuthentication no"
       
-      - name: Bloquear root via SSH  
-        lineinfile:  
-          path: /etc/ssh/sshd_config  
-          state: present  
-          regexp: "^PermitRootLogin"  
-          line: "PermitRootLogin no"  
+      - name: Bloquear root via SSH
+        lineinfile:
+          path: /etc/ssh/sshd_config
+          state: present
+          regexp: "^PermitRootLogin"
+          line: "PermitRootLogin no"
       
-      - name: Reiniciar serviço SSH  
-        service:  
-          name: ssh  
+      - name: Reiniciar serviço SSH
+        service:
+          name: ssh
           state: restarted
+      
+      # Configurar chaves públicas para os usuários
+      - name: Garantir que o diretório ~/.ssh existe para todos os usuários
+        file:
+          path: "/home/{{ item }}/.ssh"
+          state: directory
+          mode: '0700'
+          owner: "{{ item }}"
+          group: "{{ item }}"
+        with_items:
+          - samuel
+          - isabel
+          
+      - name: Copiar chave pública de samuel para os usuários remotos
+        authorized_key:
+          user: "{{ item }}"
+          state: present
+          key: "{{ lookup('file', '~/Downloads/projeto/samuel_rsa.pub') }}"
+        with_items:
+          - samuel
+          
+      - name: Copiar chave pública de isabel para os usuários remotos
+        authorized_key:
+          user: "{{ item }}"
+          state: present
+          key: "{{ lookup('file', '~/Downloads/projeto/isabel_rsa.pub') }}"
+        with_items:
+          - isabel
+          
+      - name: Permitir acesso apenas ao grupo "acesso_ssh"
+        lineinfile:
+          path: /etc/ssh/sshd_config
+          regexp: "^#?AllowGroups"
+          line: "AllowGroups acesso_ssh"
+
 
 ### **Configurar LVM** 
 A tarefa realiza a instalação dos pacotes necessários para utilizar a funcionalidade LVM (Logical Volume Management). Em seguida, cria um grupo de volumes chamado "dados" e um volume lógico chamado "sistema", com o tamanho especificado. Após a criação do volume lógico, ele é formatado no sistema de arquivos ext4. Finalmente, um diretório é criado para que o volume lógico seja montado corretamente no sistema.
 
-      - name: Instalar pacotes necessários para LVM  
-        apt:  
-          name: lvm2  
-          state: present  
+---
+      - name: Instalar pacotes necessários
+        apt:
+          name: "{{ item }}"
+          state: present
+        loop:
+          - lvm2
       
-      - name: Criar Volume Group chamado "dados"  
-        lvg:  
-          vg: dados  
-          pvs:  
-            - /dev/sdb  
-            - /dev/sdc  
-            - /dev/sdd  
+      - name: Criar Volume Group chamado "dados"
+        lvg:
+          vg: dados
+          pvs:
+            - /dev/sdb
+            - /dev/sdc
+            - /dev/sdd
       
-      - name: Criar Logical Volume "sistema"  
-        community.general.lvl:  
-          vg: dados  
-          lv: sistema  
-          size: 15g  
+      - name: Criar Logical Volume "sistema"
+        community.general.lvol:
+          vg: dados
+          lv: sistema
+          size: 15g
       
-      - name: Formatar o LV "sistema" como ext4  
-        filesystem:  
-          fstype: ext4  
-          dev: "/dev/dados/sistema"  
+      - name: Formatar o LV "sistema" como ext4
+        filesystem:
+          fstype: ext4
+          dev: /dev/dados/sistema
       
-      - name: Criar diretório "/dados" e montar a partição  
-        file:  
-          path: /dados  
-          state: directory  
-        notify:  
-          - Montar partição
-
+      - name: Criar diretório /dados
+        file:
+          path: /dados
+          state: directory
+      
+      - name: Montar o LV "sistema" em /dados
+        mount:
+          path: /dados
+          src: /dev/dados/sistema
+          fstype: ext4
+          state: mounted
+      
+      - name: Configurar montagem automática no /etc/fstab
+        mount:
+          path: /dados
+          src: /dev/dados/sistema
+          fstype: ext4
+          opts: defaults
+          state: present
+          
 ### **Configurar NFS** 
 Configura o serviço NFS para compartilhamento de arquivos entre sistemas.
 Esta tarefa realiza a instalação dos pacotes necessários para o servidor NFS, cria um usuário específico que não pode realizar login diretamente, configura o diretório compartilhado pelo NFS, adiciona as permissões adequadas no arquivo /etc/exports para permitir o acesso à rede local e reinicia o serviço do servidor NFS após as configurações.
 
-      - name: Instalar o servidor NFS  
-        apt:  
-          name: nfs-kernel-server  
-          state: present  
+      - name: Instalar o servidor NFS
+        apt:
+          name: nfs-kernel-server
+          state: present
       
-      - name: Criar usuário "nfs-ifpb" para NFS  
-        user:  
-          name: nfs-ifpb  
-          shell: /usr/sbin/nologin  
+      - name: Criar usuário "nfs-ifpb" para NFS
+        user:
+          name: nfs-ifpb
+          shell: /usr/sbin/nologin
       
-      - name: Criar diretório NFS  
-        file:  
-          path: /dados/nfs  
-          state: directory  
-          owner: nfs-ifpb  
-          group: nfs-ifpb  
+      - name: Criar diretório NFS
+        file:
+          path: /dados/nfs
+          state: directory
+          owner: nfs-ifpb
+          group: nfs-ifpb
       
-      - name: Configurar diretório compartilhado NFS  
-        blockinfile:  
-          path: /etc/exports  
-          block: |  
-            /dados/nfs 192.168.57.0/24(rw,sync,no_root_squash)  
+      - name: Dar permissão 777 ao diretório NFS
+        file:
+          path: /dados/nfs
+          mode: "0777"
+          owner: nfs-ifpb
+          group: nfs-ifpb
       
-      - name: Reiniciar o servidor NFS  
-        service:  
-          name: nfs-kernel-server  
+      - name: Configurar diretório compartilhado NFS
+        blockinfile:
+          path: /etc/exports
+          block: |
+            /dados/nfs 192.168.57.0/24(rw,sync,no_subtree_check,all_squash,anonuid=1001,anongid=1001)
+      
+      - name: Reiniciar o servidor NFS
+        service:
+          name: nfs-kernel-server
           state: restarted
 
 ### **Monitorar acessos** 
 
-      - name: Configurar script de monitoramento de acessos  
-        copy:  
-          dest: /etc/profile.d/monitor_acesso.sh  
-          content: |  
-            #!/bin/bash  
-            echo "$(date '+%Y-%m-%d %H:%M'); $USER; $SSH_TTY"  
-          mode: "0755"
+      - name: Criar script de monitoramento
+        copy:
+          content: |
+            #!/bin/bash
+            echo "$(date '+%Y-%m-%d %H:%M'); $USER; $(tty); $SSH_CONNECTION" >> /dados/nfs/acessos
+          dest: /usr/local/bin/monitor.sh
+          mode: 0755
+      
+      - name: Configurar script para ser executado no login
+        lineinfile:
+          path: /etc/profile
+          line: "/usr/local/bin/monitor.sh"
+          state: present
 
 O conteúdo descreve a tarefa, que consiste em configurar um script de monitoramento de acessos. O módulo copy é utilizado para criar ou modificar arquivos no destino especificado. A diretiva dest define o caminho onde o script será salvo, que é /etc/profile.d/monitor_acesso.sh. 
 #
