@@ -1,0 +1,34 @@
+- name: Instalar o servidor NFS
+  apt:
+    name: nfs-kernel-server
+    state: present
+
+- name: Criar usuário "nfs-ifpb" para NFS
+  user:
+    name: nfs-ifpb
+    shell: /usr/sbin/nologin
+
+- name: Criar diretório NFS
+  file:
+    path: /dados/nfs
+    state: directory
+    owner: nfs-ifpb
+    group: nfs-ifpb
+
+- name: Dar permissão 777 ao diretório NFS
+  file:
+    path: /dados/nfs
+    mode: "0777"
+    owner: nfs-ifpb
+    group: nfs-ifpb
+
+- name: Configurar diretório compartilhado NFS
+  blockinfile:
+    path: /etc/exports
+    block: |
+      /dados/nfs 192.168.57.0/24(rw,sync,no_subtree_check,all_squash,anonuid=1001,anongid=1001)
+
+- name: Reiniciar o servidor NFS
+  service:
+    name: nfs-kernel-server
+    state: restarted

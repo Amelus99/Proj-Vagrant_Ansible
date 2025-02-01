@@ -1,0 +1,14 @@
+---
+- name: Criar script de monitoramento
+  copy:
+    content: |
+      #!/bin/bash
+      echo "$(date '+%Y-%m-%d %H:%M'); $USER; $(tty); $SSH_CONNECTION" >> /dados/nfs/acessos
+    dest: /usr/local/bin/monitor.sh
+    mode: 0755
+
+- name: Configurar script para ser executado no login
+  lineinfile:
+    path: /etc/profile
+    line: "/usr/local/bin/monitor.sh"
+    state: present

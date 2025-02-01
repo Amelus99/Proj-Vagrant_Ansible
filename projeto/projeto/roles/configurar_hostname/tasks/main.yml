@@ -1,0 +1,4 @@
+- name: Configurar Hostname
+  hostname:
+    name: "p01-samuel-isabel"
+

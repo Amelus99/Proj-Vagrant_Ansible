@@ -1,0 +1,46 @@
+---
+- name: Instalar pacotes necessários
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - lvm2
+
+- name: Criar Volume Group chamado "dados"
+  lvg:
+    vg: dados
+    pvs:
+      - /dev/sdb
+      - /dev/sdc
+      - /dev/sdd
+
+- name: Criar Logical Volume "sistema"
+  community.general.lvol:
+    vg: dados
+    lv: sistema
+    size: 15g
+
+- name: Formatar o LV "sistema" como ext4
+  filesystem:
+    fstype: ext4
+    dev: /dev/dados/sistema
+
+- name: Criar diretório /dados
+  file:
+    path: /dados
+    state: directory
+
+- name: Montar o LV "sistema" em /dados
+  mount:
+    path: /dados
+    src: /dev/dados/sistema
+    fstype: ext4
+    state: mounted
+
+- name: Configurar montagem automática no /etc/fstab
+  mount:
+    path: /dados
+    src: /dev/dados/sistema
+    fstype: ext4
+    opts: defaults
+    state: present

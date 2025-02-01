@@ -1,0 +1,7 @@
+- name: Configurar Mensagem de Saudação
+  copy:
+    content: |
+      Acesso restrito apenas à pessoas com autorização expressa
+      Seu acesso está sendo monitorado !!!
+    dest: /etc/motd
+
