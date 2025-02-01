@@ -1,5 +1,0 @@
-- name: Atualizar Sistema Operacional
-  apt:
-    update_cache: yes
-    upgrade: dist
-

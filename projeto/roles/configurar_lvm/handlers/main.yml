@@ -1,2 +1,0 @@
-- name: Montar partição
-  command: mount -a

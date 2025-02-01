@@ -1,6 +1,0 @@
-- name: Permitir que o grupo "ifpb" tenha acesso SUDO
-  copy:
-    dest: /etc/sudoers.d/ifpb
-    content: "%ifpb ALL=(ALL) NOPASSWD:ALL"
-    mode: "0440"
-
