@@ -314,7 +314,7 @@ Esta tarefa realiza a instalação dos pacotes necessários para o servidor NFS,
 
 O conteúdo descreve a tarefa, que consiste em configurar um script de monitoramento de acessos. O módulo copy é utilizado para criar ou modificar arquivos no destino especificado. A diretiva dest define o caminho onde o script será salvo, que é /etc/profile.d/monitor_acesso.sh. 
 #
-# Testes e Funcionalidade
+# 5.Testes e Funcionalidade
 ### Verificação da conectividade.
 
       samuel@samuel-Latitude-5430:~/Downloads/projetos$ ssh isabel@192.168.57.10  
@@ -403,8 +403,12 @@ O conteúdo descreve a tarefa, que consiste em configurar um script de monitoram
       #PermitRootLogin prohibit-password  
       PermitRootLogin no
 
-
-   
-   
+  # 6.Conclusão
+   A demais, foram realizados testes para verificar as outras fazes, os mesmos foram agrupados em Dados do projeto Teste https://github.com/Bellsatu/Vagrant/tree/4b275c0e2203c87fe6c095a2bf9d45b3e01e3bb4/Dados%20do%20projeto%20Testes. Ao fazer os testes no NFS, foi observado que ao tentar escrever um arquivo na pasta remota, o usuário deve atender a requisitos de permissão específicos.
+O arquivo pode ser colocado na pasta remota apenas se o usuário tiver permissões de 777.
+   Se o usuário tiver permissões de 775, ele não conseguirá realizar a operação de escrita.
+Conforme mencionado, após ajustar as permissões para 777 para o usuário Samuel, a operação foi bem-sucedida.
+   As permissões são cruciais para a operação de escrita na pasta remota. É necessário garantir que os usuários tenham as permissões corretas para evitar falhas na transferência de arquivos.
+   Entre outras conjunturas foi verificado o acesso via SSH utilizando chaves públicas, e confirmando que o acesso por senha e o login com root estão bloqueados. Verificado que o volume LVM foi criado e montado corretamente, e o compartilhamento NFS estava funcionando com as permissões esperadas, levantando apenas as resalvas supracitadas. O monitoramento de acessos também funcionou, registrando corretamente os logins no arquivo de log.
       
       
