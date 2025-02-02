@@ -346,7 +346,7 @@ O conteúdo descreve a tarefa, que consiste em configurar um script de monitoram
       $ ls -ld /dev/dados/nfs
       drwxr-xr-x 2 nfs-ifpb nfs-ifpb 40 Jan 27 02:07 /dev/dados/nfs
 
- A pasta /dados/nfs está sendo compartilhada para a rede 192.168.57.0/24 com configurações para otimizar desempenho e segurança. As operações de escrita são síncronas (sync) e agrupadas (wdelay), enquanto verificações de subárvore são desativadas (hide, no_subtree_check) para melhorar a performance. O acesso anônimo é controlado com anonuid=1001 e anongid=1001. O compartilhamento permite leitura e escrita (rw), utiliza segurança básica (sec=sys) e restringe acessos com secure. A opção no_root_squash garante que o usuário root no cliente tenha acesso root no servidor.
+ A pasta /dados/nfs está sendo compartilhada para a rede 192.168.57.0/24 com configurações para otimizar desempenho e segurança. As operações de escrita são síncronas (sync) e agrupadas (wdelay), enquanto verificações de subárvore são desativadas (hide, no_subtree_check) para melhorar a performance. O acesso anônimo é controlado com **anonuid=1001** e **anongid=1001**. O compartilhamento permite leitura e escrita (rw), utiliza segurança básica (sec=sys) e restringe acessos com secure. A opção **no_root_squash** garante que o usuário root no cliente tenha acesso root no servidor.
       
       $ sudo exportfs -v  
       sudo: unable to resolve host p01-Isabel: Temporary failure in name resolution  
