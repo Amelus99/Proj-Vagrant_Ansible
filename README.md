@@ -147,7 +147,7 @@ Primeiramente, o playbook desabilita a autenticação por senha, configurando o 
 
 Após realizar essas mudanças, o playbook reinicia o serviço SSH para garantir que as novas configurações entrem em vigor. Esse reinício é essencial para que o servidor comece a aplicar as restrições e políticas de segurança.
 
-Uma parte importante de todo este processo, é a criação do diretório **~/.ssh** para os usuários **Samuel** e **isabel**, **0700**). As chaves públicas desses usuários são copiadas para os arquivos ~/.ssh/authorized_keys, permitindo o acesso via chave pública.
+Uma parte importante de todo este processo, é a criação do diretório **~/.ssh** para os usuários **Samuel** e **isabel**, **0700**). As chaves públicas desses usuários são copiadas para os arquivos **~/.ssh/authorized_keys**, permitindo o acesso via chave pública.
 
 Por fim, é feita a limitação para acesso apenas ao grupo **acesso_ssh** garantido assim que apenas os membros possam estar fazendo o acesso SSH. aumentando a segurança do sistema, permitindo apenas acessos autorizados.
 
