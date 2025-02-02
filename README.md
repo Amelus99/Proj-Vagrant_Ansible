@@ -149,9 +149,8 @@ Após realizar essas mudanças, o playbook reinicia o serviço SSH para garantir
 
 Uma parte importante de todo este processo, é a criação do diretório **~/.ssh** para os usuários **Samuel** e **isabel**, **0700**). As chaves públicas desses usuários são copiadas para os arquivos ~/.ssh/authorized_keys, permitindo o acesso via chave pública.
 
-Por fim, é feit a limitação para acesso apenas para o grupo **acesso_ssh**
+Por fim, é feita a limitação para acesso apenas ao grupo **acesso_ssh** garantido assim que apenas os membros possam estar fazendo o acesso SSH. aumentando a segurança do sistema, permitindo apenas acessos autorizados.
 
-Por fim, o playbook configura o SSH para permitir o acesso apenas aos usuários pertencentes ao grupo acesso_ssh.
 
       # Configurar o serviço SSH
       - name: Permitir apenas chaves públicas
@@ -403,6 +402,8 @@ O conteúdo descreve a tarefa, que consiste em configurar um script de monitoram
       sudo: unable to resolve host p01-Isabel: Temporary failure in name resolution  
       #PermitRootLogin prohibit-password  
       PermitRootLogin no
+
+
    
    
       
