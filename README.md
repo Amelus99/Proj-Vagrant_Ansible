@@ -141,14 +141,15 @@ O código permite que os membros do grupo ifpb tenham acesso sudo sem exigir sen
 ### **Configurar SSH** 
 
 o playbook a seguir tem o objetivo de fazer uma configuração ssh de forma mais segura, o código tem  composição de tarefas que
-fazer a configuração SSH, ajustando  suas  necessidades de segurança e garantido que apenas usuários autorizados possam estar fazendo acesso.
+fazem a configuração SSH, ajustando  suas  necessidades de segurança e garantido que apenas usuários autorizados possam estar fazendo acesso.
 
-Primeiramente, o playbook desabilita a autenticação por senha, configurando o arquivo de configuração do SSH ( /etc/ssh/sshd_config) PasswordAuthenticationpara no
+Primeiramente, o playbook desabilita a autenticação por senha, configurando o arquivo de configuração do SSH ( /etc/ssh/sshd_config) **PasswordAuthentication** para **no**
 
 Após realizar essas mudanças, o playbook reinicia o serviço SSH para garantir que as novas configurações entrem em vigor. Esse reinício é essencial para que o servidor comece a aplicar as restrições e políticas de segurança.
 
-uma parti importante de todo este processo, é a criação do diretório ~/.ssh
-para os usuários Samuel e isabel, 0700).
+Uma parte importante de todo este processo, é a criação do diretório **~/.ssh** para os usuários **Samuel** e **isabel**, **0700**). As chaves públicas desses usuários são copiadas para os arquivos ~/.ssh/authorized_keys, permitindo o acesso via chave pública.
+
+Por fim, é feit a limitação para acesso apenas para o grupo **acesso_ssh**
 
 Por fim, o playbook configura o SSH para permitir o acesso apenas aos usuários pertencentes ao grupo acesso_ssh.
 
