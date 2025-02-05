@@ -6,9 +6,11 @@
 # Projeto de Infraestrutura com Vagrant e Ansible
 
 # 1. Introdução
-Grandes avanços no mundo digital tornam evidente que o uso de ferramentas de automação e virtualização é essencial para aumentar a eficiência e reduzir significativamente os erros. O Vagrant e o Ansible são exemplos de tecnologias amplamente utilizadas nesse contexto.
+O projeto de infraestrutura com Vagrant e Ansible teve como objetivo principal a criação de um ambiente virtualizado automatizado, promovendo eficiência e segurança na administração de sistemas. Foram utilizadas ferramentas de código aberto para provisionamento e configuração de máquinas virtuais, com destaque para o Vagrant, responsável pela criação e gerenciamento do ambiente virtual, e o Ansible, empregado para a automação das tarefas de configuração.
 
-Neste projeto, analisaremos a integração desses dois componentes, explicando de forma breve suas funcionalidades individuais e como trabalham juntos.
+As atividades realizadas incluíram a configuração de uma máquina virtual baseada no Debian Bookworm, a definição de uma rede privada, e o provisionamento automatizado por meio de playbooks do Ansible. Diversas roles foram desenvolvidas para automatizar processos essenciais, como atualização do sistema, configuração de hostname, criação de usuários, definição de políticas de acesso via SSH, configuração de permissões administrativas com sudo, e implementação de mecanismos de segurança.
+
+Além disso, o projeto envolveu a configuração de Logical Volume Management (LVM) para otimização do gerenciamento de armazenamento e a implementação do Network File System (NFS) para compartilhamento de arquivos em rede. Um sistema de monitoramento de acessos também foi desenvolvido, garantindo o registro de logins e a segurança do ambiente.
 
 # 2. O que é Vagrant?
 Vagrant é uma ferramenta de código aberto que permite a criação e configuração rápida de ambientes de desenvolvimento virtualizados. Com Vagrant, é possível:
