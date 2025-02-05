@@ -314,6 +314,14 @@ Esta tarefa realiza a instalação dos pacotes necessários para o servidor NFS,
 
 O conteúdo descreve a tarefa, que consiste em configurar um script de monitoramento de acessos. O módulo copy é utilizado para criar ou modificar arquivos no destino especificado. A diretiva dest define o caminho onde o script será salvo, que é /etc/profile.d/monitor_acesso.sh. 
 #
+# 5.Desafios na Produção do Projeto de Infraestrutura com Vagrant e Ansible
+### Configuração de Rede e Acesso SSH
+
+A configuração da rede privada e o acesso via SSH apresentaram desafios, especialmente no que diz respeito à segurança. O bloqueio do acesso root e a desativação da autenticação por senha exigiram testes rigorosos para garantir que o acesso por chaves públicas estivesse funcionando corretamente. Problemas com permissões de diretórios e configurações inconsistentes do SSH dificultaram o progresso em alguns momentos.
+
+### Configuração do NFS
+A definição das permissões corretas para os diretórios compartilhados foi crucial, uma vez que permissões inadequadas impediam a escrita de arquivos por determinados usuários.
+
 # 5.Testes e Funcionalidade
 ### Verificação da conectividade.
 
