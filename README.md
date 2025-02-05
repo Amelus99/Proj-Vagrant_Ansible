@@ -376,7 +376,7 @@ A definição das permissões corretas para os diretórios compartilhados foi cr
       #VAGRANT-END  
       /dev/dados/sistema /dados ext4 defaults 0 0  
       $
-
+#
 ### SSH PASSWORD E ROOT 
 
       $ sudo cat /etc/ssh/sshd_config | grep PasswordAuthentication  
@@ -392,7 +392,6 @@ A definição das permissões corretas para os diretórios compartilhados foi cr
       PermitRootLogin no
 #
 # 7. Comandos para testes.
-#
 ### Comando: 
       ssh -i ~/Downloads/projeto/isabel_rsa isab@192.168.57.10
    
