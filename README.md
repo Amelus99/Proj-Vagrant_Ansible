@@ -4,7 +4,7 @@
 ### Professor: *Pedro Filho*
 #                                    
 # Projeto de Infraestrutura com Vagrant e Ansible
-      [!NOTE]
+
 # 1. Introdução
 Grandes avanços no mundo digital tornam evidente que o uso de ferramentas de automação e virtualização é essencial para aumentar a eficiência e reduzir significativamente os erros. O Vagrant e o Ansible são exemplos de tecnologias amplamente utilizadas nesse contexto.
 
