@@ -325,43 +325,23 @@ A definição das permissões corretas para os diretórios compartilhados foi cr
 # 6.Testes e Funcionalidade
 ### Verificação da conectividade.
 
-      samuel@samuel-Latitude-5430:~/Downloads/projetos$ ssh isabel@192.168.57.10  
-      Linux p01-Isabel 6.1.0-29-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.123-1 (2025-01-02) x86_64  
-      Acesso restrito apenas a pessoas com autorização expressa  
-      Seu acesso está sendo monitorado !!!  
-      Last login: Sun Jan 26 23:38:31 2025 from 192.168.57.1  
-      $ apt list --upgradable  
-      Listing... Done  
-      $ hostname  
-      p01-Isabel  
-      $ id isabel  
-      uid=1001(isabel) gid=1003(isabel) groups=1003(isabel),1001(acesso_ssh),1002(ifpb)  
-      $ sudo ls  
-      sudo: unable to resolve host p01-Isabel: Temporary failure in name resolution  
-      $ sudo apt update  
-      sudo: unable to resolve host p01-Isabel: Temporary failure in name resolution  
-      Hit:1 https://deb.debian.org/debian bookworm InRelease  
-      Hit:2 https://deb.debian.org/debian bookworm-updates InRelease  
-      Hit:3 https://deb.debian.org/debian bookworm-backports InRelease  
-      Hit:4 https://security.debian.org/debian-security bookworm-security InRelease  
-      Reading package lists... Done  
-      Building dependency tree       
-      Reading state information... Done  
-      All packages are up to date.  
-      $
+      samuel@samuel-Latitude-5430:~/Downloads/projeto$ ssh -i ~/Downloads/projeto/isabel_rsa isabel@192.168.57.10  
+      The authenticity of host '192.168.57.10 (192.168.57.10)' can't be established.  
+      ED25519 key fingerprint is SHA256:
+#
 ### NFS
    
-      $ ls -ld /dev/dados/nfs
-      drwxr-xr-x 2 nfs-ifpb nfs-ifpb 40 Jan 27 02:07 /dev/dados/nfs
+      samuel@samuel-Latitude-5430:~/Downloads/projeto$ sudo mkdir /mnt/nfs  
+      samuel@samuel-Latitude-5430:~/Downloads/projeto$ ls  
+      disk1.vdi  disk3.vdi  isabel_rsa.pub  roles  samuel_rsa  playbook.yml  Vagrantfile  
+      samuel@samuel-Latitude-5430:~/Downloads/projeto$ sudo mount 192.168.57.10:/dados/nfs /mnt/nfs  
+      samuel@samuel-Latitude-5430:~/Downloads/projeto$ df -h /mnt/nfs  
+      Sist. Arq.  Tam.  Usado  Disp.  Uso% Montado em  
+      192.168.57.10:/dados/nfs  15G   0   14G   0%  /mnt/nfs  
+      samuel@samuel-Latitude-5430:~/Downloads/projeto$
 
  A pasta /dados/nfs está sendo compartilhada para a rede 192.168.57.0/24 com configurações para otimizar desempenho e segurança. As operações de escrita são síncronas (sync) e agrupadas (wdelay), enquanto verificações de subárvore são desativadas (hide, no_subtree_check) para melhorar a performance. O acesso anônimo é controlado com **anonuid=1001** e **anongid=1001**. O compartilhamento permite leitura e escrita (rw), utiliza segurança básica (sec=sys) e restringe acessos com secure. A opção **no_root_squash** garante que o usuário root no cliente tenha acesso root no servidor.
-      
-      $ sudo exportfs -v  
-      sudo: unable to resolve host p01-Isabel: Temporary failure in name resolution  
-      /dados/nfs 192.168.57.0/24(sync,wdelay,hide,no_subtree_check,anonuid=1001,anongid=1001,sec=sys,rw,secure,no_root_squash,no_all_squash)  
-      $
-
-      
+#         
 ### LVM
 
       $ sudo blkid  
