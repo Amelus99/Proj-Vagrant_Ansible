@@ -322,7 +322,7 @@ A configuração da rede privada e o acesso via SSH apresentaram desafios, espec
 ### Configuração do NFS
 A definição das permissões corretas para os diretórios compartilhados foi crucial, uma vez que permissões inadequadas impediam a escrita de arquivos por determinados usuários.
 
-# 5.Testes e Funcionalidade
+# 6.Testes e Funcionalidade
 ### Verificação da conectividade.
 
       samuel@samuel-Latitude-5430:~/Downloads/projetos$ ssh isabel@192.168.57.10  
@@ -411,7 +411,7 @@ A definição das permissões corretas para os diretórios compartilhados foi cr
       #PermitRootLogin prohibit-password  
       PermitRootLogin no
 
-  # 6.Conclusão
+  # 7.Conclusão
    A demais, foram realizados testes para verificar as outras fazes, os mesmos foram agrupados em Dados do projeto Teste https://github.com/Bellsatu/Vagrant/tree/4b275c0e2203c87fe6c095a2bf9d45b3e01e3bb4/Dados%20do%20projeto%20Testes. Ao fazer os testes no NFS, foi observado que ao tentar escrever um arquivo na pasta remota, o usuário deve atender a requisitos de permissão específicos.
 O arquivo pode ser colocado na pasta remota apenas se o usuário tiver permissões de 777.
    Se o usuário tiver permissões de 775, ele não conseguirá realizar a operação de escrita.
