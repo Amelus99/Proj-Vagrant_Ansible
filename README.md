@@ -410,8 +410,36 @@ A definição das permissões corretas para os diretórios compartilhados foi cr
       sudo: unable to resolve host p01-Isabel: Temporary failure in name resolution  
       #PermitRootLogin prohibit-password  
       PermitRootLogin no
+#
+# 7. Comandos para testes.
+#
+### Comando: 
+      ssh -i ~/Downloads/projeto/isabel_rsa isab@192.168.57.10
+   
+Conexão via SSH a um servidor com o IP 192.168.57.10, usando a chave de autenticação localizada em ~/Downloads/projeto/isabel_rsa.
+#
+### Comandos:
+      ls -l /usr/local/bin/monitor.sh
+      cat /usr/local/bin/monitor.sh
+ O primeiro comando lista detalhes sobre o arquivo monitor.sh, mostrando que ele é um script executável e que pertence ao usuário root. O segundo comando exibe o conteúdo do script, que gera um log com a data, usuário, terminal e conexão SSH. Isso indica que o acesso aos usuários está sendo monitorado.
+ #
+### Comandos:
+      cat /dados/nfs/acessos
+      sudo vgdisplay dados
+      sudo lvdisplay /dev/dados/sistema
+   O primeiro comando exibe o log de acessos gerado pelo script. Os seguintes comandos exibem informações sobre Volume Group (VG) e Logical Volume (LV), mostrando as propriedades e a utilização do espaço em disco.
+#
+### Comando: 
+      ls -ld /dados/nfs
+   Mostra a listagem do diretório /dados/nfs, indicando suas permissões e detalhes de propriedade. Este diretório é relevante para o armazenamento de dados NFS.
+   #
+### Comandos:
+      sudo mkdir /mnt/nfs
+      sudo mount 192.168.57.10:/dados/nfs /mnt/nfs
+      df -h /mnt/nfs
+   O primeiro comando cria um diretório para a montagem do NFS. O segundo comando monta o diretório do servidor NFS no diretório local criado. O terceiro comando verifica o uso do sistema de arquivos montado
 
-  # 7.Conclusão
+  # 8.Conclusão
    A demais, foram realizados testes para verificar as outras fazes, os mesmos foram agrupados em Dados do projeto Teste https://github.com/Bellsatu/Vagrant/tree/4b275c0e2203c87fe6c095a2bf9d45b3e01e3bb4/Dados%20do%20projeto%20Testes. Ao fazer os testes no NFS, foi observado que ao tentar escrever um arquivo na pasta remota, o usuário deve atender a requisitos de permissão específicos.
 O arquivo pode ser colocado na pasta remota apenas se o usuário tiver permissões de 777.
    Se o usuário tiver permissões de 775, ele não conseguirá realizar a operação de escrita.
